@@ -3,6 +3,8 @@ package com.example.demo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.FileSystemResource;
 
 import com.example.workflow.BooleanActivity;
 import com.example.workflow.FirstActivity;
@@ -128,10 +131,39 @@ class DemoApplicationTests {
 	// 	System.out.println("Activities executed: " + status.getSerializedOutput());
 	// }
 
-	@Test
-	void testInfiniteEventConsumerWorkflow() throws TimeoutException {
+	// @Test
+	// void testInfiniteEventConsumerWorkflow() throws TimeoutException {
 		
-		WorkflowRuntimeBuilder builder = new WorkflowRuntimeBuilder().registerWorkflow(InfiniteEventConsumerWorkflow.class);
+	// 	WorkflowRuntimeBuilder builder = new WorkflowRuntimeBuilder().registerWorkflow(InfiniteEventConsumerWorkflow.class);
+	// 	builder.registerActivity(FirstActivity.class);
+	// 	builder.registerActivity(SecondActivity.class);
+		
+
+	// 	try (WorkflowRuntime runtime = builder.build()) {
+	// 		System.out.println("Start workflow runtime");
+	// 		runtime.start(false);
+	// 	}
+
+	// 	WorkflowPayload payload = new WorkflowPayload();
+	// 	String instanceId = workflowClient.scheduleNewWorkflow(InfiniteEventConsumerWorkflow.class, payload);
+	// 	System.out.printf("scheduled new workflow instance of InfiniteEventConsumerWorkflow with instance ID: %s%n",
+	// 		instanceId);
+	
+	
+	// 	workflowClient.waitForInstanceStart(instanceId, Duration.ofSeconds(10), false);
+
+	// 	for(int i = 0; i < 1000; i++){
+	// 		System.out.println("Raising an event with payload true");
+	// 		workflowClient.raiseEvent(instanceId, "IncomingEvent", true);
+	// 	}
+
+	// 	workflowClient.raiseEvent(instanceId, "IncomingEvent", false);
+	// }
+
+	@Test
+	void testLargePayloadWorkflow() throws TimeoutException, IOException {
+
+		WorkflowRuntimeBuilder builder = new WorkflowRuntimeBuilder().registerWorkflow(SimpleTestWorkflow.class);
 		builder.registerActivity(FirstActivity.class);
 		builder.registerActivity(SecondActivity.class);
 		
@@ -142,19 +174,11 @@ class DemoApplicationTests {
 		}
 
 		WorkflowPayload payload = new WorkflowPayload();
-		String instanceId = workflowClient.scheduleNewWorkflow(InfiniteEventConsumerWorkflow.class, payload);
-		System.out.printf("scheduled new workflow instance of InfiniteEventConsumerWorkflow with instance ID: %s%n",
+		payload.setPayload(new FileSystemResource(Paths.get("/tmp/large.data")).getContentAsByteArray());
+		String instanceId = workflowClient.scheduleNewWorkflow(SimpleTestWorkflow.class, payload);
+		System.out.printf("scheduled new workflow instance of SimpleTestWorkflow with instance ID: %s%n",
 			instanceId);
-	
-	
-		workflowClient.waitForInstanceStart(instanceId, Duration.ofSeconds(10), false);
-
-		for(int i = 0; i < 1000; i++){
-			System.out.println("Raising an event with payload true");
-			workflowClient.raiseEvent(instanceId, "IncomingEvent", true);
-		}
-
-		workflowClient.raiseEvent(instanceId, "IncomingEvent", false);
+		
 	}
 }
 

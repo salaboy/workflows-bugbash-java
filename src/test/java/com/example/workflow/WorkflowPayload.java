@@ -6,6 +6,7 @@ import java.util.List;
 public class WorkflowPayload{
     private String workflowId;
     private List<String> executedActivities = new ArrayList();
+    private byte[] payload;
 
     public WorkflowPayload() {
     }
@@ -30,6 +31,22 @@ public class WorkflowPayload{
         return executedActivities;
     }
 
+
+    public void setExecutedActivities(List<String> executedActivities) {
+        this.executedActivities = executedActivities;
+    }
+
+
+    public byte[] getPayload() {
+        return payload;
+    }
+
+
+    public void setPayload(byte[] payload) {
+        this.payload = payload;
+    }
+
+    
     
 
     
