@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.workflow.BooleanActivity;
 import com.example.workflow.FirstActivity;
+import com.example.workflow.InfiniteEventConsumerWorkflow;
 import com.example.workflow.RecursiveWorkflow;
 import com.example.workflow.SecondActivity;
 import com.example.workflow.SimpleTestWorkflow;
@@ -99,9 +100,38 @@ class DemoApplicationTests {
 	// 	workflowClient.terminateWorkflow("804f2415-eab8-4893-acd9-a6fa3735f956", null );
 	// }
 
+	// @Test
+	// void testTonsOfActivitiesWorkflow() throws TimeoutException {
+	// 	WorkflowRuntimeBuilder builder = new WorkflowRuntimeBuilder().registerWorkflow(TonsOfActivitiesWorkflow.class);
+	// 	builder.registerActivity(FirstActivity.class);
+	// 	builder.registerActivity(SecondActivity.class);
+		
+
+	// 	try (WorkflowRuntime runtime = builder.build()) {
+	// 		System.out.println("Start workflow runtime");
+	// 		runtime.start(false);
+	// 	}
+
+	// 	WorkflowPayload payload = new WorkflowPayload();
+	// 	String instanceId = workflowClient.scheduleNewWorkflow(TonsOfActivitiesWorkflow.class, payload);
+	// 	System.out.printf("scheduled new workflow instance of SimpleWorkflow with instance ID: %s%n",
+	// 		instanceId);
+	
+	
+	// 	workflowClient.waitForInstanceStart(instanceId, Duration.ofSeconds(10), false);
+	
+	// 	WorkflowInstanceStatus status = workflowClient.waitForInstanceCompletion(instanceId, Duration.ofSeconds(10), true);
+		
+
+	// 	assertEquals(WorkflowRuntimeStatus.COMPLETED, status.getRuntimeStatus() );
+
+	// 	System.out.println("Activities executed: " + status.getSerializedOutput());
+	// }
+
 	@Test
-	void testTonsOfActivitiesWorkflow() throws TimeoutException {
-		WorkflowRuntimeBuilder builder = new WorkflowRuntimeBuilder().registerWorkflow(TonsOfActivitiesWorkflow.class);
+	void testInfiniteEventConsumerWorkflow() throws TimeoutException {
+		
+		WorkflowRuntimeBuilder builder = new WorkflowRuntimeBuilder().registerWorkflow(InfiniteEventConsumerWorkflow.class);
 		builder.registerActivity(FirstActivity.class);
 		builder.registerActivity(SecondActivity.class);
 		
@@ -112,18 +142,20 @@ class DemoApplicationTests {
 		}
 
 		WorkflowPayload payload = new WorkflowPayload();
-		String instanceId = workflowClient.scheduleNewWorkflow(TonsOfActivitiesWorkflow.class, payload);
-		System.out.printf("scheduled new workflow instance of SimpleWorkflow with instance ID: %s%n",
+		String instanceId = workflowClient.scheduleNewWorkflow(InfiniteEventConsumerWorkflow.class, payload);
+		System.out.printf("scheduled new workflow instance of InfiniteEventConsumerWorkflow with instance ID: %s%n",
 			instanceId);
 	
 	
 		workflowClient.waitForInstanceStart(instanceId, Duration.ofSeconds(10), false);
-	
-		WorkflowInstanceStatus status = workflowClient.waitForInstanceCompletion(instanceId, Duration.ofSeconds(10), true);
-		
 
-		assertEquals(WorkflowRuntimeStatus.COMPLETED, status.getRuntimeStatus() );
+		for(int i = 0; i < 1000; i++){
+			System.out.println("Raising an event with payload true");
+			workflowClient.raiseEvent(instanceId, "IncomingEvent", true);
+		}
 
-		System.out.println("Activities executed: " + status.getSerializedOutput());
+		workflowClient.raiseEvent(instanceId, "IncomingEvent", false);
 	}
 }
+
+
