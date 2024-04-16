@@ -7,7 +7,7 @@ import io.dapr.workflows.Workflow;
 import io.dapr.workflows.WorkflowStub;
 
 
-public class TestWorkflow extends Workflow{
+public class SimpleTestWorkflow extends Workflow{
   
   @Override
   public WorkflowStub create() {
