@@ -20,6 +20,17 @@ Then run:
 mvn package
 ```
 
-Reported Issues: 
-- https://github.com/diagridio/issues/issues/3649
 
+## Scenarios
+
+- Simple workflow with two activities (happy path)
+- Recursive workflow that keeps running activities forever
+- Stopping recursive workflows fail
+- Running 100+ activities, runs until 29 and then nothing happens
+- Consuming infinite amount of events, kinda works once, then I think I am rate limited but with no errors to the client
+- Large payloads accept max around 3 mb (it works)
+
+Notes: 
+- I got a lot of intermittent errors connecting to the APIs
+- Once things break it is better to create a new App Id and work there, there is no way to restart or reset an app id if it gets stuck
+- I didn't saw metrics when only using the workflow APIs
