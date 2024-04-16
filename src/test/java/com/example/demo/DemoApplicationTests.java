@@ -1,6 +1,11 @@
 package com.example.demo;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
@@ -15,6 +20,7 @@ import io.dapr.workflows.client.DaprWorkflowClient;
 import io.dapr.workflows.client.WorkflowInstanceStatus;
 import io.dapr.workflows.runtime.WorkflowRuntime;
 import io.dapr.workflows.runtime.WorkflowRuntimeBuilder;
+import io.dapr.workflows.runtime.WorkflowRuntimeStatus;
 
 @SpringBootTest
 class DemoApplicationTests {
@@ -42,8 +48,12 @@ class DemoApplicationTests {
 	
 		WorkflowInstanceStatus status = workflowClient.waitForInstanceCompletion(instanceId, Duration.ofSeconds(10), true);
 		
-		System.out.println("Workflow Status: " + status.getRuntimeStatus().name());
-		System.out.println("Workflow output: " + status.getSerializedOutput());
+
+		assertEquals(WorkflowRuntimeStatus.COMPLETED, status.getRuntimeStatus() );
+		assertEquals("[\"First Activity\",\"Second Activity\"]", status.getSerializedOutput());
+		List outputs = status.readOutputAs(List.class);
+		assertTrue(outputs.contains("First Activity"));
+		assertTrue(outputs.contains("Second Activity"));
 		
 	}
 
