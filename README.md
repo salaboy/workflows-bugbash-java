@@ -28,7 +28,7 @@ mvn package
 - Stopping recursive workflows fail
 - Running 100+ activities, runs until 29 and then nothing happens
 - Consuming infinite amount of events, kinda works once, then I think I am rate limited but with no errors to the client
-- Large payloads accept max around 3 mb (it works)
+- Large payloads accept max around 3 mb (it works) -> create file with: `mkfile -n 2.5m /tmp/large.data`
 
 Notes: 
 - I got a lot of intermittent errors connecting to the APIs
